@@ -1,0 +1,201 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif; /* Fallback font */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: black; /* Ensuring the background is black */
+}
+
+.principMain-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.notFound-not-found-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    padding-top: 0;
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0;
+    font-family: face;
+    position: relative;
+    overflow: hidden;
+}
+
+.notFound-not-found-content.notFound-glitch {
+    animation: notFound-glitch-effect 0.1s infinite alternate;
+}
+
+@keyframes notFound-glitch-effect {
+    0% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+        filter: hue-rotate(90deg);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+        filter: hue-rotate(180deg);
+    }
+    60% {
+        transform: translate(2px, 2px);
+        filter: hue-rotate(270deg);
+    }
+    80% {
+        transform: translate(2px, -2px);
+        filter: hue-rotate(360deg);
+    }
+    100% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+}
+
+/* Código de error 404 */
+.notFound-error-code {
+    font-size: 8em;
+    font-weight: bold;
+    color: rgb(146, 0, 0);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 0 0 15px rgb(146, 0, 0, 0.7);
+}
+
+.notFound-error-code .notFound-digit {
+    animation: notFound-bounce 1s infinite alternate;
+}
+
+.notFound-error-code .notFound-digit:nth-child(1) { animation-delay: 0s; }
+.notFound-error-code .notFound-digit:nth-child(2) { animation-delay: 0.1s; }
+.notFound-error-code .notFound-digit:nth-child(3) { animation-delay: 0.2s; }
+
+@keyframes notFound-bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
+/* Título de error */
+.notFound-error-title {
+    font-size: 2.5em;
+    color: #f0f0f0;
+    margin-bottom: 15px;
+}
+
+/* Mensaje de error principal */
+.notFound-error-message {
+    font-size: 1.2em;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 600px;
+}
+
+/* Botones de acción */
+.notFound-action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.notFound-home-button {
+    padding: 15px 30px;
+    border: none;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 200px;
+    background-color: rgb(146, 0, 0);
+    color: white;
+    box-shadow: 0 4px 10px rgba(146, 0, 0, 0.4);
+}
+
+.notFound-home-button:hover {
+    background-color: rgb(170, 0, 0);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(146, 0, 0, 0.6);
+}
+
+/* Media Queries para Responsividad */
+
+/* Laptop (1280 x 720) y pantallas más pequeñas */
+@media (max-width: 1280px) {
+    .notFound-error-code {
+        font-size: 6em;
+    }
+
+    .notFound-error-title {
+        font-size: 2em;
+    }
+
+    .notFound-error-message {
+        font-size: 1.1em;
+    }
+
+    .notFound-home-button {
+        padding: 12px 25px;
+        align-items: center;
+        text-align: center;
+        font-size: 1em;
+        min-width: 180px;
+    }
+}
+
+/* Móvil (menos de 786px) */
+@media (max-width: 786px) {
+    .notFound-not-found-content {
+        padding: 15px;
+        padding-top: 0;
+        border-radius: 10px;
+    }
+
+    .notFound-error-code {
+        font-size: 5em;
+        margin-bottom: 5px;
+    }
+
+    .notFound-error-title {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .notFound-error-message {
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+
+    .notFound-action-buttons {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        align-items: center;
+    }
+
+    .notFound-home-button {
+        width: 90%;
+        max-width: 300px;
+        font-size: 1em;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 20px;
+    }
+}
