@@ -7,11 +7,13 @@ module.exports = (sequelize, DataTypes) => {
         },
         eventoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'evento_id'
         },
         etapaId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'etapa_id'
         },
         nombre: {
             type: DataTypes.STRING,
@@ -40,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: true,
         indexes: [{
             unique: true,
-            fields: ['evento_Id', 'ubicacion']
+            fields: ['eventoId', 'ubicacion']
         }]
     });
 
