@@ -1,7 +1,6 @@
 const CartService = require('../services/cartService');
 const { Carrito } = require('../database/models');
 
-// Helper para validar el estado del carrito
 const validateCartState = async (cartId, userId) => {
     const cart = await Carrito.findOne({
         where: { id: cartId, user_id: userId }
@@ -42,12 +41,10 @@ exports.addItem = async (req, res) => {
             });
         }
 
-        const { tipo, carritoId } = req.body;
+        const { tipo, carritoId, palcoId } = req.body;
 
-        // Validar estado del carrito antes de cualquier operación
         await validateCartState(carritoId, req.user.id);
 
-        // Verificar que el carrito pertenece al usuario
         const cart = await Carrito.findOne({
             where: { id: carritoId, user_id: req.user.id }
         });
@@ -58,13 +55,14 @@ exports.addItem = async (req, res) => {
                 error: 'No autorizado o carrito no encontrado'
             });
         }
-
-        // Añadir el item
+        
+        // Pass palcoId to the service
         const item = await CartService.addItemToCart({
             userId: req.user.id,
             itemData: {
                 ...req.body,
-                userId: req.user.id
+                userId: req.user.id,
+                palcoId, // Explicitly pass palcoId
             }
         });
 
@@ -84,13 +82,11 @@ exports.addItem = async (req, res) => {
 
 exports.updateItem = async (req, res) => {
     try {
-        // Obtener el carrito del usuario primero
         const cart = await CartService.getUserCart(req.user.id);
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
 
-        // Validar estado del carrito usando el ID obtenido
         await validateCartState(cart.id, req.user.id);
 
         const updatedItem = await CartService.updateCartItem({
@@ -114,13 +110,11 @@ exports.updateItem = async (req, res) => {
 
 exports.removeItem = async (req, res) => {
     try {
-        // Obtener el carrito del usuario primero
         const cart = await CartService.getUserCart(req.user.id);
         if (!cart) {
             throw new Error('Carrito no encontrado');
         }
 
-        // Validar estado del carrito usando el ID obtenido
         await validateCartState(cart.id, req.user.id);
 
         const updatedCart = await CartService.removeItemFromCart({
@@ -142,7 +136,6 @@ exports.removeItem = async (req, res) => {
 
 exports.clearCart = async (req, res) => {
     try {
-        // Asumiendo que el servicio devuelve el carritoId o que se puede obtener de otra manera
         const cart = await CartService.getUserCart(req.user.id);
         if (cart) {
             await validateCartState(cart.id, req.user.id);

@@ -18,42 +18,53 @@ function generarCodigoUnico(longitud = 28) {
 
 // Crear ticket automáticamente al momento de la compra
 exports.createTicket = async (data, transaction = null) => {
-  const { userId, etapaId, tipo, compraId, carritoId, paqueteId } = data;
-
-  const etapa = await Etapa.findByPk(etapaId, {
-    include: [{
-      model: Evento,
-      as: 'evento',
-      attributes: ['trigrama']
-    }],
-    transaction
-  });
-
-  if (!etapa) throw new Error('Etapa no encontrada');
-  if (!etapa.evento) throw new Error('Evento no encontrado para esta etapa');
-  if (!etapa.evento.trigrama || etapa.evento.trigrama.length !== 3) {
-    throw new Error('Trigrama del evento no válido');
-  }
-
-  const trigrama = etapa.evento.trigrama.toUpperCase();
+  const { userId, etapaId, tipo, compraId, carritoId, paqueteId, palcoId } = data;
 
   const ticketData = {
-    eventoId: etapa.eventoId,
-    etapaId,
-    userId: userId || null,
-    compraId: compraId || null,
-    carritoId: carritoId || null,
-    paqueteId: paqueteId || null, // <--- ASSIGN paqueteId, set to null if not provided
+    userId,
+    compraId,
+    carritoId,
     tipo,
-    usado: false,
-    qrCode: `${trigrama}-${generarCodigoUnico()}`
+    paqueteId: paqueteId || null,
+    palcoId: palcoId || null,
   };
 
-  const ticket = transaction
-    ? await Ticket.create(ticketData, { transaction })
-    : await Ticket.create(ticketData);
+  // Obtener la etapa y evento
+  let etapa = null;
+  if (etapaId) {
+    etapa = await Etapa.findByPk(etapaId, {
+      include: [{ model: Evento, as: 'evento', attributes: ['trigrama', 'id'] }],
+      transaction
+    });
+    if (!etapa) throw new Error('Etapa no encontrada');
+    if (!etapa.evento) throw new Error('Evento no encontrado para esta etapa');
 
-  return ticket;
+    ticketData.etapaId = etapa.id;
+    ticketData.eventoId = etapa.evento.id;
+  } else if (palcoId) {
+    const palco = await Palco.findByPk(palcoId, {
+      include: [{ model: Evento, as: 'evento', attributes: ['trigrama', 'id'] }],
+      transaction
+    });
+    if (!palco) throw new Error('Palco no encontrado');
+    if (!palco.evento) throw new Error('Evento no encontrado para este palco');
+
+    ticketData.etapaId = palco.etapaId;
+    ticketData.eventoId = palco.evento.id;
+  } else {
+    throw new Error('Falta el ID de etapa o palco para generar el ticket');
+  }
+
+  // Generar código QR
+  const trigrama = etapa?.evento?.trigrama || 'XXX';
+  const codigoUnico = generarCodigoUnico();
+  const qrData = `${trigrama}-${ticketData.etapaId || '0'}-${ticketData.paqueteId || '0'}-${ticketData.palcoId || '0'}-${codigoUnico}`;
+  ticketData.qrCode = qrData;
+
+  // Crear ticket en la base de datos
+  const newTicket = await Ticket.create(ticketData, { transaction });
+  console.log(`Ticket creado con QR: ${qrData}`);
+  return newTicket;
 };
 
 

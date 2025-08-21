@@ -11,12 +11,12 @@ const JWT_CONTROL_SECRET = process.env.JWT_CONTROL_SECRET;
 
 const registerUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, telefono } = req.body;
 
         if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
-                error: 'Todos los campos son requeridos'
+                error: 'Todos los campos requeridos (nombre de usuario, email, y contraseña) son requeridos'
             });
         }
 
@@ -45,6 +45,7 @@ const registerUser = async (req, res) => {
             username,
             email,
             password,
+            telefono,
             role: 'user'
         });
 
@@ -56,7 +57,8 @@ const registerUser = async (req, res) => {
             data: {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                telefono: user.telefono
             }
         });
     } catch (error) {

@@ -10,6 +10,7 @@ const Etapa = require('./Etapa')(sequelize, DataTypes);
 const Ticket = require('./Ticket')(sequelize, DataTypes);
 const Compra = require('./Compra')(sequelize, DataTypes);
 const Paquete = require('./Paquete')(sequelize, DataTypes);
+const Palco = require('./Palco')(sequelize, DataTypes);
 const Carrito = require('./Carrito')(sequelize, DataTypes);
 const ItemCarrito = require('./ItemCarrito')(sequelize, DataTypes);
 const CompraItem = require('./CompraItem')(sequelize, DataTypes);
@@ -26,6 +27,7 @@ const db = {
   Ticket,
   Compra,
   Paquete,
+  Palco,
   Carrito,
   ItemCarrito,
   CompraItem,

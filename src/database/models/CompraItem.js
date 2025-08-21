@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     tipo: DataTypes.STRING,
     etapaId: DataTypes.INTEGER,
     paqueteId: DataTypes.INTEGER,
+    palcoId: DataTypes.INTEGER,
     cantidad: DataTypes.INTEGER,
     precio: DataTypes.FLOAT,
     tipoTicket: DataTypes.STRING,
@@ -37,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
     CompraItem.belongsTo(models.Paquete, {
       foreignKey: 'paqueteId',
       as: 'paquete'
+    });
+    CompraItem.belongsTo(models.Palco, {
+      foreignKey: 'palcoId',
+      as: 'palco'
     });
     CompraItem.belongsTo(models.Evento, {
       foreignKey: 'eventoId',

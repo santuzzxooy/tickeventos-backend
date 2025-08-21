@@ -52,6 +52,7 @@ exports.crearPreferenciaPago = async (req, res) => {
                 tipo: item.tipo,
                 etapaId: item.etapaId,
                 paqueteId: item.paqueteId,
+                palcoId: item.palcoId,
                 cantidad: item.cantidad,
                 precio: item.precio,
                 tipoTicket: item.tipoTicket,
@@ -149,6 +150,11 @@ exports.webhookMercadoPago = async (req, res) => {
                             model: sequelize.models.Paquete,
                             as: 'paquete',
                             attributes: ['nombre']
+                        },
+                        {
+                            model: sequelize.models.Palco,
+                            as: 'palco',
+                            attributes: ['nombre']
                         }
                     ]
                 },
@@ -202,49 +208,58 @@ exports.webhookMercadoPago = async (req, res) => {
                 try {
                     const itemsHtml = compra.items.map(item => {
                         const nombreEvento = item.etapa?.evento?.nombre || 'Evento Desconocido';
-                        const nombreEtapa = item.etapa?.nombre ? ` - Etapa: ${item.etapa.nombre}` : '';
-                        const nombrePaquete = item.paquete?.nombre ? ` - Paquete: ${item.paquete.nombre}` : '';
-                        const tipoTicket = item.tipoTicket ? ` (${item.tipoTicket})` : '';
+                        let tipoItem = '';
+
+                        if (item.tipo === 'ticket') {
+                            tipoItem = `Tipo de Ticket: ${item.tipoTicket || 'General'}`;
+                        } else if (item.tipo === 'paquete') {
+                            tipoItem = `Paquete: ${item.paquete?.nombre || 'Desconocido'}`;
+                        } else if (item.tipo === 'palco') {
+                            tipoItem = `Palco: ${item.palco?.nombre || 'Desconocido'}`;
+                        }
 
                         return `
-                            <p style="margin: 5px 0;">
-                                <strong>Evento:</strong> ${nombreEvento}${nombreEtapa}${nombrePaquete} <br>
-                                <strong>Tipo de Ticket:</strong> ${tipoTicket} <br>
-                                <strong>Cantidad:</strong> ${item.cantidad} <br>
-                                <strong>Precio Unitario:</strong> $${(item.precio / item.cantidad).toLocaleString('es-CO')} COP <br>
-                                <strong>Precio total:</strong> $${item.precio.toLocaleString('es-CO')} COP
-                            </p>
-                            <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+                            <div style="background-color: #f0f0f0; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                                <h3 style="color: #003366; margin-top: 0;">${nombreEvento}</h3>
+                                <p style="margin: 5px 0;">
+                                    <strong>${tipoItem}</strong> <br>
+                                    <strong>Cantidad:</strong> ${item.cantidad} <br>
+                                    <strong>Precio Unitario:</strong> $${(item.precio / item.cantidad).toLocaleString('es-CO')} COP <br>
+                                    <strong>Precio Total:</strong> $${item.precio.toLocaleString('es-CO')} COP
+                                </p>
+                            </div>
                         `;
                     }).join('');
 
                     const mailOptions = {
                         from: process.env.EMAIL_USER,
-                        to: compra.correo, // Usar el correo proporcionado en la compra
-                        subject: '¡Tu compra en hardcodecol.com ha sido confirmada!',
+                        to: compra.correo,
+                        subject: '¡Tu compra en tickeventos.com ha sido confirmada!',
                         html: `
-                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #000; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                                <div style="background-color: rgb(146, 0, 0); padding: 25px; text-align: center;">
-                                    <h1 style="color: #fff; margin: 0; font-size: 28px;">¡Compra Confirmada!</h1>
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #fff; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                <div style="background-color: #003366; padding: 25px; text-align: center;">
+                                    <h1 style="color: #fff; margin: 0; font-size: 28px;">¡Compra Confirmada! 🎉</h1>
                                 </div>
-                                <div style="padding: 30px; color: #fff;">
-                                    <p style="font-size: 16px; line-height: 1.6;">Hola <strong style="color: rgb(146, 0, 0);">${compra.nombres || ''} ${compra.apellidos || ''}</strong>,</p>
-                                    <p style="font-size: 16px; line-height: 1.6;">¡Gracias por tu compra en hardcodecol.com! Tu transacción ha sido procesada exitosamente.</p>
-                                    <p style="font-size: 18px; font-weight: bold; color: rgb(146, 0, 0);">Detalles de tu compra:</p>
-                                    <p style="font-size: 16px; margin-bottom: 5px;"><strong>ID de Compra:</strong> ${compra.id}</p>
-                                    <p style="font-size: 16px; margin-bottom: 5px;"><strong>Fecha de Pago:</strong> ${new Date(compra.fecha_pago).toLocaleString('es-CO')}</p>
-                                    <p style="font-size: 16px; margin-bottom: 5px;"><strong>Método de Pago:</strong> ${payment.payment_type_id}</p>
-                                    <p style="background-color: #222; color: rgb(146, 0, 0); padding: 15px; text-align: center; font-size: 20px; font-weight: bold; margin: 25px 0;">
+                                <div style="padding: 30px; color: #333;">
+                                    <p style="font-size: 16px; line-height: 1.6;">Hola <strong style="color: #003366;">${compra.nombres || ''} ${compra.apellidos || ''}</strong>,</p>
+                                    <p style="font-size: 16px; line-height: 1.6;">¡Gracias por tu compra en tickeventos.com! Tu transacción ha sido procesada exitosamente.</p>
+                                    <p style="font-size: 18px; font-weight: bold; color: #003366;">Detalles de tu compra:</p>
+                                    <ul style="list-style-type: none; padding: 0;">
+                                        <li style="font-size: 16px; margin-bottom: 5px;"><strong>ID de Compra:</strong> ${compra.id}</li>
+                                        <li style="font-size: 16px; margin-bottom: 5px;"><strong>Fecha de Pago:</strong> ${new Date(compra.fecha_pago).toLocaleString('es-CO')}</li>
+                                        <li style="font-size: 16px; margin-bottom: 5px;"><strong>Método de Pago:</strong> ${payment.payment_type_id}</li>
+                                    </ul>
+                                    <p style="background-color: #e6f7ff; color: #003366; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; margin: 25px 0; border-radius: 8px;">
                                         Monto Total Pagado: $${compra.precio_total.toLocaleString('es-CO')} COP
                                     </p>
-                                    <p style="font-size: 18px; font-weight: bold; color: rgb(146, 0, 0); margin-top: 25px;">Tickets Incluidos:</p>
-                                    <div style="background-color: #222; padding: 15px;">
+                                    <p style="font-size: 18px; font-weight: bold; color: #003366; margin-top: 25px;">Tickets Incluidos:</p>
+                                    <div>
                                         ${itemsHtml}
                                     </div>
                                     <p style="font-size: 16px; line-height: 1.6; margin-top: 30px;">Puedes ver tus tickets y el estado de tu compra en tu panel de usuario en nuestra página web.</p>
-                                    <p style="font-size: 16px; font-weight: bold; color: rgb(146, 0, 0);">hardcodecol.com</p>
+                                    <p style="font-size: 16px; font-weight: bold; color: #003366;">tickeventos.com</p>
                                 </div>
-                                <div style="background-color: #222; padding: 15px; text-align: center; font-size: 12px; color: #888;">
+                                <div style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #888;">
                                     Este es un correo electrónico generado automáticamente. Por favor, no lo respondas.
                                 </div>
                             </div>
@@ -293,30 +308,30 @@ exports.webhookMercadoPago = async (req, res) => {
 exports.generarTicketsDesdeCompra = async (compra, transaction) => {
     try {
         for (const item of compra.items) {
-            // Validar campos obligatorios
-            if (!item.etapaId || !item.tipoTicket) {
-                console.error(`Item ${item.id} no tiene etapaId o tipoTicket válido`);
+            // Validar campos obligatorios según el tipo de ítem
+            if (item.tipo === 'ticket' && (!item.etapaId || !item.tipoTicket)) {
+                console.error(`Item ${item.id} (ticket) no tiene etapaId o tipoTicket válido`);
                 continue;
             }
 
-            // Obtener datos del evento (para el trigrama del QR)
-            const etapa = await sequelize.models.Etapa.findByPk(item.etapaId, {
-                include: [{
-                    model: sequelize.models.Evento,
-                    as: 'evento',
-                    attributes: ['trigrama']
-                }],
-                transaction
-            });
-
-            if (!etapa || !etapa.evento) {
-                throw new Error(`No se encontró evento para la etapa del item ${item.id}`);
+            if ((item.tipo === 'paquete' || item.tipo === 'palco') && !item.etapaId) {
+                console.error(`Item ${item.id} (${item.tipo}) no tiene etapaId válido`);
+                continue;
             }
 
             // Determinar cuántos tickets crear según el tipo de ítem
-            let cantidadTickets = item.cantidad;
-            if (item.tipo === 'paquete') {
+            let cantidadTickets = 0;
+            if (item.tipo === 'ticket') {
+                cantidadTickets = item.cantidad;
+            } else if (item.tipo === 'paquete') {
                 cantidadTickets = item.cantidad * (item.ticketsPaquete || 1);
+            } else if (item.tipo === 'palco') {
+                // Se asume que item.palco está precargado en la consulta de la compra
+                if (!item.palco || !item.palco.cantidadTickets) {
+                    console.error(`No se pudo obtener la cantidad de tickets del palco para el item ${item.id}`);
+                    continue;
+                }
+                cantidadTickets = item.palco.cantidadTickets;
             }
 
             // Crear los tickets
@@ -324,10 +339,11 @@ exports.generarTicketsDesdeCompra = async (compra, transaction) => {
                 await ticketController.createTicket({
                     userId: compra.userId,
                     etapaId: item.etapaId,
-                    tipo: item.tipoTicket,
+                    tipo: item.tipoTicket || 'General',
                     compraId: compra.id,
                     carritoId: compra.carritoId,
-                    paqueteId: item.paqueteId
+                    paqueteId: item.paqueteId,
+                    palcoId: item.palcoId
                 }, transaction);
             }
         }

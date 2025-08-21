@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    telefono: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     cedula: {
       type: DataTypes.STRING,
       allowNull: true

@@ -47,6 +47,17 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    telefono: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+      validate: {
+        is: {
+          args: /^\+?(\d{1,3})?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
+          msg: 'Formato de teléfono no válido'
+        }
+      }
+    },
     role: {
       type: DataTypes.ENUM('user', 'admin', 'entry_control'),
       defaultValue: 'user',
@@ -93,7 +104,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tickets'
       });
     }
-    
+
     // Relación con Carrito (1:1)
     if (models.Carrito) {
       User.hasOne(models.Carrito, {
@@ -102,7 +113,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE'
       });
     }
-    
+
     // Relación con Compras
     if (models.Purchase) {
       User.hasMany(models.Purchase, {
