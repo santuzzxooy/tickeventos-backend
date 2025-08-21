@@ -79,6 +79,7 @@ app.use("/api/eventos", require("./routes/eventoRoutes"));
 app.use("/api/banners", require("./routes/bannerRoutes"));
 app.use("/api/etapas", require("./routes/etapaRoutes"));
 app.use("/api/paquetes", require("./routes/paqueteRoutes"));
+app.use("/api/palcos", require("./routes/palcoRoutes"));
 app.use("/api/tickets", require("./routes/ticketRoutes"));
 app.use("/api/carrito", require("./routes/carritoRoutes"));
 app.use("/api/compras", require("./routes/compraRoutes"));
